@@ -4,7 +4,7 @@ An exercise to develop a lock for Internet of Things class at UH Manoa.
 
 A demo (as of the time of this commit) can be found at [https://nodered.codered.ro/](https://nodered.codered.ro/)
 
-##Licenses
+## Licenses
 This software is license can be found [here](https://github.com/rosshiga/EE491_IoT/blob/master/LICENSE).
 
 This software distributes [w3card-blog](https://github.com/rosshiga/w3card-blog) which is under public license by [Ross Higa](https://github.com/rosshiga).
@@ -16,7 +16,7 @@ This software makes use of [Node-RED](https://nodered.org/) runtime/framework wh
 
 
 
-##Usage
+## Usage
 This repository is designed to clone into a HTTPS server directory
 
 finalsourcePi.txt is a JSON flow designed to be deployed on a Raspberry Pi/w SenseHat using Node-RED
