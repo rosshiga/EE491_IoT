@@ -10,9 +10,7 @@
     <title>EE 491 IoT</title>
     <link rel="stylesheet" href="assets/blog.css">
     <script src="assets/blog.js"></script>
-    <script type="application/javascript"
-            src="https://ee491node.mybluemix.net/status.jsonp">
-    </script>
+
 
         </head>
 <body>
@@ -71,7 +69,7 @@
 
                 <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                     <header class="w3-container w3-theme-d3">
-                        <h3>Title</h3>
+                        <h3>Locked</h3>
                     </header>
                     <div class="w3-container">
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -89,7 +87,7 @@
 
             <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                 <header class="w3-container w3-theme-d3">
-                    <h3>Title</h3>
+                    <h3>Unlocked</h3>
                 </header>
                 <div class="w3-container">
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -107,7 +105,7 @@
 
             <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                 <header class="w3-container w3-theme-d3">
-                    <h3>Title</h3>
+                    <h3>Stolen</h3>
                 </header>
                 <div class="w3-container">
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -133,4 +131,14 @@
     </div>
 </div>
 </body>
+
+<!-- This unhides the correct card-->
+<script>
+    function jsonp(data) {
+        toggleCard(data.status);
+    }
+</script>
+<script type="application/javascript"
+        src="https://ee491node.mybluemix.net/status.jsonp">
+</script>
 </html>
