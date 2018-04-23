@@ -1,0 +1,392 @@
+[
+    {
+        "id": "e4f445b1.148048",
+        "type": "tab",
+        "label": "Lock Service",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2ead599.c769ea6",
+        "type": "wiotp-credentials",
+        "z": "",
+        "name": "WIOT",
+        "org": "q0b0je",
+        "serverName": "",
+        "devType": "SenseHat",
+        "devId": "home2",
+        "keepalive": "65",
+        "cleansession": true,
+        "tls": "",
+        "usetls": false
+    },
+    {
+        "id": "bbefabaf.059d68",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "Store compass, switch to lock mode",
+        "func": "msg.header = {\"Content-Type\" : \"application/json\"};\n\nvar now = new Date(); \nvar last = flow.get(\"last\"); \nvar storedTurn = flow.get(\"storedTurn\"); \nvar x, y, z, speed;\nvar mopedStats = msg.payload;\nvar turn  = mopedStats.compass;\nif(msg.topic == \"Unlocked\"){\n    msg.topic = \"not stolen\";\n}\n\nelse if(storedTurn === null){\n        flow.set(\"storedTurn\", mopedStats.compass);\n        console.log(\"Stored compass as %i\", mopedStats.compass);\n} \n\n\n\n    flow.set(\"last\", now.getTime());\n    \n    x = mopedStats.acceleration.x;\n    y = mopedStats.acceleration.y; \n    z = mopedStats.acceleration.z; \n   \n    speed = Math.sqrt(Math.pow(x,2)+Math.pow(y,2)+Math.pow(z,2));\n\n\nif(speed > 1.15){\n    console.log(\"Speed %f\",speed);\n\n     let hi_compass = (storedTurn + 12) % 360;\n     let low_compass = Math.abs((storedTurn -12) % 360);\n        console.log(\"Compass hi: %i low: %i stored: %f, current: %f\",hi_compass, low_compass, storedTurn, turn); \n        if(hi_compass <= turn ||\n        low_compass >= turn){\n        msg.topic = \"stolen\";\n        flow.set(\"status\" , \"stolen\");    \n        }\n        \n}\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 592.5715179443359,
+        "y": 103.0000114440918,
+        "wires": [
+            [
+                "c6b6dcc2.44b84"
+            ]
+        ]
+    },
+    {
+        "id": "20f34078.39973",
+        "type": "switch",
+        "z": "e4f445b1.148048",
+        "name": "Sort Locked/Unlock",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Unlocked",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Locked",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "outputs": 2,
+        "x": 379.4503593444824,
+        "y": 303.67458724975586,
+        "wires": [
+            [
+                "e965b320.b659b"
+            ],
+            [
+                "7660c3c1.1515ec"
+            ]
+        ]
+    },
+    {
+        "id": "c6b6dcc2.44b84",
+        "type": "switch",
+        "z": "e4f445b1.148048",
+        "name": "Filter only Stolen events",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "stolen",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 872.7143402099609,
+        "y": 103.7500114440918,
+        "wires": [
+            [
+                "7771eec2.74004"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7dc348b3.274e88",
+        "type": "rpi-sensehat in",
+        "z": "e4f445b1.148048",
+        "name": "Bike Movement",
+        "motion": true,
+        "env": false,
+        "stick": false,
+        "x": 114.00001525878906,
+        "y": 106.00001525878906,
+        "wires": [
+            [
+                "8150a9e8.069d38"
+            ]
+        ]
+    },
+    {
+        "id": "7660c3c1.1515ec",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "Set to Locked",
+        "func": "if(flow.get(\"status\") == \"Locked\" || flow.get(\"status\") == \"stolen\"){\n    msg.topic = \"Status Error\";\n    msg.payload = {};\n}\nelse{\nflow.set(\"status\", \"Locked\");\nflow.set(\"storedTurn\", null);\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 615.4027671813965,
+        "y": 331.8056125640869,
+        "wires": [
+            [
+                "961b6e6.3d7d59"
+            ]
+        ]
+    },
+    {
+        "id": "c08abe2c.39a6",
+        "type": "wiotp out",
+        "z": "e4f445b1.148048",
+        "authType": "g",
+        "qs": "false",
+        "qsDeviceId": "",
+        "deviceKey": "2ead599.c769ea6",
+        "deviceType": "SenseHat",
+        "deviceId": "home2",
+        "event": "alarm",
+        "format": "json",
+        "qos": "",
+        "name": "Send Alarm",
+        "x": 1594.7383918762207,
+        "y": 90.7222318649292,
+        "wires": []
+    },
+    {
+        "id": "8d4b26a5.043c98",
+        "type": "inject",
+        "z": "e4f445b1.148048",
+        "name": "Inject Test Alarm",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 120.16667175292969,
+        "y": 190.88888549804688,
+        "wires": [
+            [
+                "cbe213d2.8263e"
+            ]
+        ]
+    },
+    {
+        "id": "cbe213d2.8263e",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "msg.payload == 999",
+        "func": "msg.payload = {\"acceleration\":{\"x\":9999,\"y\":9999,\"z\":999},\"gyroscope\":{\"x\":0.0001,\"y\":0.0009,\"z\":-0.0005},\"orientation\":{\"roll\":346.2253,\"pitch\":358.3019,\"yaw\":112.1265},\"compass\":999};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 327.1666717529297,
+        "y": 191.66665649414062,
+        "wires": [
+            [
+                "bbefabaf.059d68"
+            ]
+        ]
+    },
+    {
+        "id": "8150a9e8.069d38",
+        "type": "change",
+        "z": "e4f445b1.148048",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "status",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 344.16669845581055,
+        "y": 105.22223091125488,
+        "wires": [
+            [
+                "bbefabaf.059d68"
+            ]
+        ]
+    },
+    {
+        "id": "e965b320.b659b",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "Set to Unlocked",
+        "func": "flow.set(\"status\", \"Unlocked\");\nflow.set(\"storedTurn\", null);\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 615.8611526489258,
+        "y": 276.38892555236816,
+        "wires": [
+            [
+                "961b6e6.3d7d59"
+            ]
+        ]
+    },
+    {
+        "id": "7947abac.de0414",
+        "type": "wiotp in",
+        "z": "e4f445b1.148048",
+        "authType": "g",
+        "deviceKey": "2ead599.c769ea6",
+        "deviceType": "SenseHat",
+        "deviceId": "home2",
+        "command": "status",
+        "commandType": "d",
+        "qos": 0,
+        "name": "Un/Lock",
+        "x": 79.44444274902344,
+        "y": 305.4999990463257,
+        "wires": [
+            [
+                "c84ee2c0.29c2c"
+            ]
+        ]
+    },
+    {
+        "id": "81e02ab9.0a4608",
+        "type": "wiotp out",
+        "z": "e4f445b1.148048",
+        "authType": "g",
+        "qs": "false",
+        "qsDeviceId": "",
+        "deviceKey": "2ead599.c769ea6",
+        "deviceType": "SenseHat",
+        "deviceId": "home2",
+        "event": "status",
+        "format": "json",
+        "qos": "",
+        "name": "Report status sucess",
+        "x": 1121.6944999694824,
+        "y": 299.16666889190674,
+        "wires": []
+    },
+    {
+        "id": "961b6e6.3d7d59",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "BlueMix Status Update",
+        "func": "msg.payload = {};\nmsg.payload.d = {};\nmsg.payload.d.status = flow.get(\"status\");\nmsg.payload.d.success = \"TRUE\";\nif(msg.topic == \"Status Error\"){\n    msg.payload.d.success = \"ERROR: Already locked\";\n}\nif(flow.get(\"status\") == \"stolen\"){\n     msg.payload.d.success = \"ERROR: Dis-arm Alarm\";\n}\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 850.4444389343262,
+        "y": 298.4722032546997,
+        "wires": [
+            [
+                "81e02ab9.0a4608",
+                "30e20751.b14198"
+            ]
+        ]
+    },
+    {
+        "id": "c84ee2c0.29c2c",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "Set Topic",
+        "func": "msg.topic = msg.payload.d.status;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 217.47216033935547,
+        "y": 306.97222328186035,
+        "wires": [
+            [
+                "20f34078.39973"
+            ]
+        ]
+    },
+    {
+        "id": "7771eec2.74004",
+        "type": "function",
+        "z": "e4f445b1.148048",
+        "name": "RING ALARM JSON",
+        "func": "msg.payload = {};\nmsg.payload.d = {};\nmsg.payload.d.status = flow.get(\"status\");\nmsg.payload.d.sucess = \"TRUE\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1138.2144927978516,
+        "y": 91.96429347991943,
+        "wires": [
+            [
+                "903e3e27.ef6f9",
+                "b905a389.46197"
+            ]
+        ]
+    },
+    {
+        "id": "903e3e27.ef6f9",
+        "type": "delay",
+        "z": "e4f445b1.148048",
+        "name": "Rate Limit 1msg/10sec",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1382.887004852295,
+        "y": 93.33334445953369,
+        "wires": [
+            [
+                "c08abe2c.39a6"
+            ]
+        ]
+    },
+    {
+        "id": "30e20751.b14198",
+        "type": "debug",
+        "z": "e4f445b1.148048",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1110.8015174865723,
+        "y": 347.20241832733154,
+        "wires": []
+    },
+    {
+        "id": "b905a389.46197",
+        "type": "debug",
+        "z": "e4f445b1.148048",
+        "name": "Show Stolen!",
+        "active": true,
+        "console": "false",
+        "complete": "payload.d",
+        "x": 1357.452392578125,
+        "y": 150.9206418991089,
+        "wires": []
+    },
+    {
+        "id": "73d1efa2.84207",
+        "type": "comment",
+        "z": "e4f445b1.148048",
+        "name": "Bluemix Status Updater",
+        "info": "",
+        "x": 121.36704635620117,
+        "y": 258.41271686553955,
+        "wires": []
+    },
+    {
+        "id": "91f0b72e.1ad2c8",
+        "type": "comment",
+        "z": "e4f445b1.148048",
+        "name": "Process SenseHat",
+        "info": "",
+        "x": 130.23810577392578,
+        "y": 59.52380752563476,
+        "wires": []
+    },
+    {
+        "id": "dbb84ef4.8385a",
+        "type": "comment",
+        "z": "e4f445b1.148048",
+        "name": "Filter by movement and compass",
+        "info": "",
+        "x": 595.952392578125,
+        "y": 60.95237922668457,
+        "wires": []
+    }
+]

@@ -1,0 +1,716 @@
+[
+    {
+        "id": "7f962873.83f4c8",
+        "type": "tab",
+        "label": "External Site API",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1c1f7348.290ffd",
+        "type": "tab",
+        "label": "Handle Alarms",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8bb9a65a.7b2c08",
+        "type": "subflow",
+        "name": "Subflow 1",
+        "info": "",
+        "in": [],
+        "out": []
+    },
+    {
+        "id": "dd17807c.a2a13",
+        "type": "ibmiot",
+        "z": "",
+        "name": "API",
+        "keepalive": "60",
+        "serverName": "",
+        "cleansession": true,
+        "appId": "",
+        "shared": false
+    },
+    {
+        "id": "349dcd6f.c1a722",
+        "type": "tls-config",
+        "z": "",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "verifyservercert": true
+    },
+    {
+        "id": "78047f8e.e50d9",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "Set status to Locked",
+        "func": "flow.set(\"statusBM\", \"Locked\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 660,
+        "y": 160,
+        "wires": [
+            [
+                "e2dbf05.8475e1"
+            ]
+        ]
+    },
+    {
+        "id": "9aa04791.f69808",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "Set to status to Unlocked",
+        "func": "flow.set(\"statusBM\", \"Unlocked\");\n    flow.set(\"pin\", -1)\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 673.7917747497559,
+        "y": 117.91663837432861,
+        "wires": [
+            [
+                "e2dbf05.8475e1",
+                "3a7a1272.89b10e"
+            ]
+        ]
+    },
+    {
+        "id": "44ac2e78.cc0bb",
+        "type": "ibmiot out",
+        "z": "7f962873.83f4c8",
+        "authentication": "apiKey",
+        "apiKey": "dd17807c.a2a13",
+        "outputType": "cmd",
+        "deviceId": "home2",
+        "deviceType": "SenseHat",
+        "eventCommandType": "status",
+        "format": "json",
+        "data": "{\"d\":{\"status\":\"Locked\"}}",
+        "qos": 0,
+        "name": "Send Pi Lock events",
+        "service": "registered",
+        "x": 1060,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "e2dbf05.8475e1",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "Build JSON",
+        "func": "msg.payload = {};\nmsg.payload.d = {};\nmsg.payload.d.status = flow.get(\"statusBM\");\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 870,
+        "y": 140,
+        "wires": [
+            [
+                "44ac2e78.cc0bb"
+            ]
+        ]
+    },
+    {
+        "id": "3b7971a5.a8cc2e",
+        "type": "http in",
+        "z": "7f962873.83f4c8",
+        "name": "POST /lock",
+        "url": "/lock",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "bc3aa3ab.f6306"
+            ]
+        ]
+    },
+    {
+        "id": "bc3aa3ab.f6306",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "Store PIN",
+        "func": "let state = flow.get(\"statusBM\");\nmsg.statusCode = 302; // Redirect\n    msg.headers ={};\n    msg.headers.Location= flow.get(\"domain\");\n\n//Not a number check for pin\nif(state == \"Unlocked\" && !isNaN(msg.payload.pin)){\n        msg.topic = \"Locked\";\n    msg.headers.Location += \"accepted.html\";\n    flow.set(\"pin\", msg.payload.pin)\n}else{\n    msg.headers.Location += \"fail.html\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 180,
+        "wires": [
+            [
+                "93f3b790.81d878",
+                "8706635c.dc0b6"
+            ]
+        ]
+    },
+    {
+        "id": "93f3b790.81d878",
+        "type": "http response",
+        "z": "7f962873.83f4c8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 450,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "17229a68.8e18c6",
+        "type": "http in",
+        "z": "7f962873.83f4c8",
+        "name": "Get status.jsonp",
+        "url": "/status.jsonp",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 280,
+        "wires": [
+            [
+                "2f46c743.08fd88"
+            ]
+        ]
+    },
+    {
+        "id": "2f46c743.08fd88",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "JSONP callback",
+        "func": "msg.header = {\"Content-Type\" : \"application/javascript\" , \"Cache-Control\" : \"no-cache\"};\n\n\n\nmsg.payload = flow.get(\"statusBM\");\n\nlet data = {};\ndata.status = flow.get(\"statusBM\");\n\nmsg.payload = \"jsonp(\";\nmsg.payload += JSON.stringify(data);\nmsg.payload += \");\"\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 300,
+        "y": 280,
+        "wires": [
+            [
+                "505a2b5c.581884"
+            ]
+        ]
+    },
+    {
+        "id": "505a2b5c.581884",
+        "type": "http response",
+        "z": "7f962873.83f4c8",
+        "name": "200 ",
+        "statusCode": "",
+        "headers": {},
+        "x": 470,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "3207fbce.0f4724",
+        "type": "inject",
+        "z": "7f962873.83f4c8",
+        "name": "Set startup values",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.01",
+        "x": 737.0833320617676,
+        "y": 222.5832781791687,
+        "wires": [
+            [
+                "21fd0f70.e1ed5"
+            ]
+        ]
+    },
+    {
+        "id": "21fd0f70.e1ed5",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "demo.rosshiga.com",
+        "func": "flow.set(\"domain\", \"https://demo.rosshiga.com/\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 957.0833320617676,
+        "y": 222.5832781791687,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e353f7c.38b4908",
+        "type": "http in",
+        "z": "7f962873.83f4c8",
+        "name": "POST /unlock",
+        "url": "/unlock",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 100,
+        "wires": [
+            [
+                "6cff4d8d.24ad64"
+            ]
+        ]
+    },
+    {
+        "id": "6cff4d8d.24ad64",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "Check PIN",
+        "func": "let state = flow.get(\"statusBM\");\nlet storedPin = flow.get(\"pin\")\n\n\nmsg.statusCode = 302; // Redirect\n    msg.headers ={};\n    msg.headers.Location= flow.get(\"domain\");\n    \nif(msg.payload.pin == storedPin){\n    msg.topic = \"Unlocked\";\n    msg.headers.Location += \"accepted.html\";\n}else{\n        msg.topic = \"error\";\n\n    msg.headers.Location += \"fail.html\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 297.0833320617676,
+        "y": 102.5832781791687,
+        "wires": [
+            [
+                "58fed625.747a48",
+                "8706635c.dc0b6"
+            ]
+        ]
+    },
+    {
+        "id": "58fed625.747a48",
+        "type": "http response",
+        "z": "7f962873.83f4c8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 470,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "8706635c.dc0b6",
+        "type": "switch",
+        "z": "7f962873.83f4c8",
+        "name": "State sorter",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Unlocked",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Locked",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 450,
+        "y": 140,
+        "wires": [
+            [
+                "9aa04791.f69808"
+            ],
+            [
+                "78047f8e.e50d9"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "8ae109f1.dabea8",
+        "type": "comment",
+        "z": "7f962873.83f4c8",
+        "name": "Interface to w3card or your site API",
+        "info": "",
+        "x": 180,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "9d76950d.bc3298",
+        "type": "comment",
+        "z": "7f962873.83f4c8",
+        "name": "Set this value to your endpoint (HTTPS)",
+        "info": "HTTPS is required because the HTTP request nodes have TLS enabled",
+        "x": 900,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "7633a870.3aa808",
+        "type": "ibmiot in",
+        "z": "1c1f7348.290ffd",
+        "authentication": "apiKey",
+        "apiKey": "dd17807c.a2a13",
+        "inputType": "evt",
+        "logicalInterfaceId": "",
+        "ruleId": "",
+        "deviceId": "home2",
+        "applicationId": "",
+        "deviceType": "+",
+        "eventType": "alarm",
+        "commandType": "",
+        "format": "json",
+        "name": "RPi Alarm Tripped",
+        "service": "registered",
+        "allDevices": "",
+        "allApplications": "",
+        "allDeviceTypes": true,
+        "allEvents": "",
+        "allCommands": "",
+        "allFormats": "",
+        "qos": 0,
+        "x": 170,
+        "y": 120,
+        "wires": [
+            [
+                "7141b174.ae019",
+                "d2f67a2e.213fa8"
+            ]
+        ]
+    },
+    {
+        "id": "7141b174.ae019",
+        "type": "debug",
+        "z": "1c1f7348.290ffd",
+        "name": "Alarm Events",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload.d",
+        "x": 380,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "d2f67a2e.213fa8",
+        "type": "function",
+        "z": "1c1f7348.290ffd",
+        "name": "Set status to stolen",
+        "func": "flow.set(\"statusBM\", \"stolen\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 390,
+        "y": 140,
+        "wires": [
+            [
+                "93fc9b6e.6ec9d8"
+            ]
+        ]
+    },
+    {
+        "id": "93fc9b6e.6ec9d8",
+        "type": "trigger",
+        "z": "1c1f7348.290ffd",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "0",
+        "extend": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "name": "Send only one phone call untill unlocked",
+        "x": 680,
+        "y": 140,
+        "wires": [
+            [
+                "7c6ed1e3.0d4a7"
+            ]
+        ]
+    },
+    {
+        "id": "290f289.b52f1d8",
+        "type": "http request",
+        "z": "1c1f7348.290ffd",
+        "name": "IFTTT Phone Call",
+        "method": "GET",
+        "ret": "txt",
+        "url": "https://maker.ifttt.com/trigger/alarm/with/key/dqExiCxpSyPm-Ju4_DFtfh",
+        "tls": "349dcd6f.c1a722",
+        "x": 970,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7c6ed1e3.0d4a7",
+        "type": "switch",
+        "z": "1c1f7348.290ffd",
+        "name": "Drop reset mesages",
+        "property": "reset",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 940,
+        "y": 140,
+        "wires": [
+            [
+                "290f289.b52f1d8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a3794278.d5981",
+        "type": "comment",
+        "z": "7f962873.83f4c8",
+        "name": "This allows the site to display the correct interface (cards)",
+        "info": "",
+        "x": 250,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "96451504.7be4e8",
+        "type": "inject",
+        "z": "7f962873.83f4c8",
+        "name": "Master Reset (debug)",
+        "topic": "Unlocked",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 620,
+        "y": 40,
+        "wires": [
+            [
+                "9aa04791.f69808"
+            ]
+        ]
+    },
+    {
+        "id": "40ec6cc3.06cba4",
+        "type": "debug",
+        "z": "7f962873.83f4c8",
+        "name": "Show Status Updates",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 1180,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "9ad9a96e.a57728",
+        "type": "ibmiot in",
+        "z": "7f962873.83f4c8",
+        "authentication": "apiKey",
+        "apiKey": "dd17807c.a2a13",
+        "inputType": "evt",
+        "logicalInterfaceId": "",
+        "ruleId": "",
+        "deviceId": "home2",
+        "applicationId": "",
+        "deviceType": "+",
+        "eventType": "status",
+        "commandType": "",
+        "format": "json",
+        "name": "RPi Status Message",
+        "service": "registered",
+        "allDevices": "",
+        "allApplications": "",
+        "allDeviceTypes": true,
+        "allEvents": "",
+        "allCommands": "",
+        "allFormats": "",
+        "qos": 0,
+        "x": 110,
+        "y": 560,
+        "wires": [
+            [
+                "cb6a449a.9cc6a8",
+                "7da7cf71.b899d"
+            ]
+        ]
+    },
+    {
+        "id": "cb6a449a.9cc6a8",
+        "type": "debug",
+        "z": "7f962873.83f4c8",
+        "name": "Status Report from Pi",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload.d",
+        "x": 140,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "eff38184.147e5",
+        "type": "http request",
+        "z": "7f962873.83f4c8",
+        "name": "Notify Locked",
+        "method": "POST",
+        "ret": "txt",
+        "url": "https://maker.ifttt.com/trigger/lockpin/with/key/dqExiCxpSyPm-Ju4_DFtfh",
+        "tls": "349dcd6f.c1a722",
+        "x": 980,
+        "y": 540,
+        "wires": [
+            [
+                "40ec6cc3.06cba4"
+            ]
+        ]
+    },
+    {
+        "id": "c034ed44.04561",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "IFTTT",
+        "func": "msg.payload = {};\n\nmsg.payload.value1 = flow.get(\"pin\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 790,
+        "y": 540,
+        "wires": [
+            [
+                "eff38184.147e5"
+            ]
+        ]
+    },
+    {
+        "id": "e43913cc.dce87",
+        "type": "switch",
+        "z": "7f962873.83f4c8",
+        "name": "Sort Status Reports",
+        "property": "payload.d.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Locked",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Unlocked",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 590,
+        "y": 560,
+        "wires": [
+            [
+                "c034ed44.04561"
+            ],
+            [
+                "ffb596ad.fc6788"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "ffb596ad.fc6788",
+        "type": "http request",
+        "z": "7f962873.83f4c8",
+        "name": "IFTTT Unlocked Notify",
+        "method": "GET",
+        "ret": "txt",
+        "url": "https://maker.ifttt.com/trigger/unlocked/with/key/dqExiCxpSyPm-Ju4_DFtfh",
+        "tls": "349dcd6f.c1a722",
+        "x": 840,
+        "y": 600,
+        "wires": [
+            [
+                "40ec6cc3.06cba4"
+            ]
+        ]
+    },
+    {
+        "id": "c7f7b2aa.c4a0a",
+        "type": "comment",
+        "z": "7f962873.83f4c8",
+        "name": "IFTTT is a free serivce and app you can use to notify and create automatic flows",
+        "info": "",
+        "x": 600,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "7da7cf71.b899d",
+        "type": "function",
+        "z": "7f962873.83f4c8",
+        "name": "Update Bluemix Status",
+        "func": "flow.set(\"statusBM\", msg.payload.d.status);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 340,
+        "y": 560,
+        "wires": [
+            [
+                "e43913cc.dce87"
+            ]
+        ]
+    },
+    {
+        "id": "3a7a1272.89b10e",
+        "type": "link out",
+        "z": "7f962873.83f4c8",
+        "name": "Reset Alarm",
+        "links": [
+            "8ec4bcba.5c3fa"
+        ],
+        "x": 880,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "8ec4bcba.5c3fa",
+        "type": "link in",
+        "z": "1c1f7348.290ffd",
+        "name": "Reset Alarm",
+        "links": [
+            "3a7a1272.89b10e"
+        ],
+        "x": 455,
+        "y": 40,
+        "wires": [
+            [
+                "1fce9f6a.0f7521"
+            ]
+        ]
+    },
+    {
+        "id": "1fce9f6a.0f7521",
+        "type": "function",
+        "z": "1c1f7348.290ffd",
+        "name": "Reset Message",
+        "func": "msg.reset = true;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 40,
+        "wires": [
+            [
+                "93fc9b6e.6ec9d8"
+            ]
+        ]
+    }
+]
