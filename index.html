@@ -10,7 +10,11 @@
     <title>EE 491 IoT</title>
     <link rel="stylesheet" href="assets/blog.css">
     <script src="assets/blog.js"></script>
-</head>
+    <script type="application/javascript"
+            src="https://ee491node.mybluemix.net/status.jsonp">
+    </script>
+
+        </head>
 <body>
 <div class="w3-row">
 
@@ -59,8 +63,8 @@
         <div class="w3-card-8 w3-theme-d3 w3-margin-mobileNav" id="mobileNav">
             <span class="w3-opennav w3-xlarge w3-hide-large w3-hide-medium " onclick="openNav()">&#9776;</span>
         </div>
-        <a href="post.html">
-            <div class="w3-col m4 l4">
+        <div class="w3-col m4 l4" id="Locked">
+
                 <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                     <header class="w3-container w3-theme-d3">
                         <h3>Title</h3>
@@ -74,85 +78,45 @@
                     </div>
 
                 </div>
-            </div>
-        </a>
-        <a href="post.html">
-            <div class="w3-col m4 l4">
-                <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-grayscale  w3-hover-opacity">
-                    <header class="w3-container w3-theme-d3">
-                        <h3>Title</h3>
-                    </header>
-                    <div class="w3-container">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Pellentesque massa urna, accumsan a viverra et, blandit eget elit.</p>
-                    </div>
 
-                </div>
-            </div>
-        </a>
-        <a href="post.html">
-            <div class="w3-col m4 l4">
-                <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-opacity">
-                    <header class="w3-container w3-theme-d3">
-                        <h3>Title</h3>
-                    </header>
-                    <div class="w3-container">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Pellentesque massa urna, accumsan a viverra et, blandit eget elit. Fusce luctus, eros quis
-                            viverra sodales, orci lorem finibus neque, sed tristique velit nisl vel odio.
-                            Praesent in tortor sodales, tincidunt elit ut, feugiat arcu.</p>
-                    </div>
+        </div>
 
-                </div>
-            </div>
-        </a>
-        <a href="post.html">
-            <div class="w3-col m4 l4">
-                <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
-                    <header class="w3-container w3-theme-d3">
-                        <h3>Title</h3>
-                    </header>
-                    <div class="w3-container">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Fusce luctus, eros quis viverra sodales, orci lorem finibus neque, sed tristique velit nisl
-                            vel
-                            odio.
-                            Praesent in tortor sodales, tincidunt elit ut, feugiat arcu.</p>
-                    </div>
+        <div class="w3-col m4 l4" id="Unlocked">
 
+            <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
+                <header class="w3-container w3-theme-d3">
+                    <h3>Title</h3>
+                </header>
+                <div class="w3-container">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Fusce luctus, eros quis viverra sodales, orci lorem finibus neque, sed tristique velit nisl
+                        vel
+                        odio.
+                        Praesent in tortor sodales, tincidunt elit ut, feugiat arcu.</p>
                 </div>
-            </div>
-        </a>
-        <a href="post.html">
-            <div class="w3-col m4 l4">
-                <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
-                    <header class="w3-container w3-theme-d3">
-                        <h3>Title</h3>
-                    </header>
-                    <div class="w3-container">
-                        <p> Fusce luctus, eros quis viverra sodales, orci lorem finibus neque, sed tristique velit nisl
-                            vel
-                            odio.
-                            Praesent in tortor sodales, tincidunt elit ut, feugiat arcu.</p>
-                    </div>
 
-                </div>
             </div>
-        </a>
-        <a href="post.html">
-            <div class="w3-col m4 l4">
-                <div class=" w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-grayscale ">
-                    <header class="w3-container w3-theme-d3">
-                        <h3>Title</h3>
-                    </header>
-                    <div class="w3-container">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Praesent in tortor sodales, tincidunt elit ut, feugiat arcu.</p>
-                    </div>
 
+        </div>
+
+        <div class="w3-col m4 l4" id="stolen">
+
+            <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
+                <header class="w3-container w3-theme-d3">
+                    <h3>Title</h3>
+                </header>
+                <div class="w3-container">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Fusce luctus, eros quis viverra sodales, orci lorem finibus neque, sed tristique velit nisl
+                        vel
+                        odio.
+                        Praesent in tortor sodales, tincidunt elit ut, feugiat arcu.</p>
                 </div>
+
             </div>
-        </a>
+
+        </div>
+
         <br><br>
     </div>
 </div>
