@@ -2,6 +2,8 @@
 Team Members: Ross Higa, Nainoa Jorg, Martiza Sagovia, Jianna Orias
 An exercise to develop a lock for Internet of Things class at UH Manoa.
 
+A demo (as of the time of this commit) can be found at [https://nodered.codered.ro/](https://nodered.codered.ro/)
+
 ##Licenses
 This software is license can be found [here](https://github.com/rosshiga/EE491_IoT/blob/master/LICENSE).
 
