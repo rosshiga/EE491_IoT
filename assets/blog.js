@@ -22,3 +22,10 @@ function toggleCard(id){
     document.getElementById(id).style.display = (document.getElementById(id).style.display == "none" ? "block" : "none");
 
 }
+
+function showCards(){
+
+    toggleCard("stolen");
+    toggleCard("Locked");
+    toggleCard("Unlocked");
+}

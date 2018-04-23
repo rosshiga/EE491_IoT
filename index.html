@@ -28,6 +28,10 @@
             <div class="w3-container w3-padding-small">
                 <a class="w3-btn w3-round-xxlarge w3-theme-d5" href="index.html">Home</a>
             </div>
+
+            <div class="w3-container w3-padding-small">
+                <a class="w3-btn w3-round-xxlarge w3-theme-d5" onclick="showCards()">Show hidden cards</a>
+            </div>
             <div class="w3-container w3-padding-small">
                 <a class="w3-btn w3-round-xxlarge w3-theme-d5 w3-hide-medium w3-hide-large" onclick="closeNav()">X
                     Close</a>
@@ -39,7 +43,7 @@
         <!--end Nav card-->
 
         <!--Author card-->
-        <div class="w3-card-12 w3-margin-card ">
+        <div class="w3-card-12 w3-margin-card">
 
             <div class="w3-container">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Angrymice.png/226px-Angrymice.png"
@@ -59,11 +63,11 @@
     </div>
 
 
-    <div class="w3-rest w3-container ">
+    <div class="w3-rest w3-container " >
         <div class="w3-card-8 w3-theme-d3 w3-margin-mobileNav" id="mobileNav">
             <span class="w3-opennav w3-xlarge w3-hide-large w3-hide-medium " onclick="openNav()">&#9776;</span>
         </div>
-        <div class="w3-col m4 l4" id="Locked">
+        <div class="w3-col m4 l4" id="Locked" style="display: none">
 
                 <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                     <header class="w3-container w3-theme-d3">
@@ -81,7 +85,7 @@
 
         </div>
 
-        <div class="w3-col m4 l4" id="Unlocked">
+        <div class="w3-col m4 l4" id="Unlocked" style="display: none">
 
             <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                 <header class="w3-container w3-theme-d3">
@@ -99,7 +103,7 @@
 
         </div>
 
-        <div class="w3-col m4 l4" id="stolen">
+        <div class="w3-col m4 l4" id="stolen" style="display: none">
 
             <div class="w3-card-8 w3-margin-card w3-display-container w3-animate-bottom w3-hover-sepia">
                 <header class="w3-container w3-theme-d3">
