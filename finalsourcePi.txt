@@ -25,11 +25,11 @@
         "type": "function",
         "z": "e4f445b1.148048",
         "name": "Store compass, switch to lock mode",
-        "func": "msg.header = {\"Content-Type\" : \"application/json\"};\n\nvar now = new Date(); \nvar last = flow.get(\"last\"); \nvar storedTurn = flow.get(\"storedTurn\"); \nvar x, y, z, speed;\nvar mopedStats = msg.payload;\nvar turn  = mopedStats.compass;\nif(msg.topic == \"Unlocked\"){\n    msg.topic = \"not stolen\";\n}\n\nelse if(storedTurn === null){\n        flow.set(\"storedTurn\", mopedStats.compass);\n        console.log(\"Stored compass as %i\", mopedStats.compass);\n} \n\n\n\n    flow.set(\"last\", now.getTime());\n    \n    x = mopedStats.acceleration.x;\n    y = mopedStats.acceleration.y; \n    z = mopedStats.acceleration.z; \n   \n    speed = Math.sqrt(Math.pow(x,2)+Math.pow(y,2)+Math.pow(z,2));\n\n\nif(speed > 1.15){\n    console.log(\"Speed %f\",speed);\n\n     let hi_compass = (storedTurn + 12) % 360;\n     let low_compass = Math.abs((storedTurn -12) % 360);\n        console.log(\"Compass hi: %i low: %i stored: %f, current: %f\",hi_compass, low_compass, storedTurn, turn); \n        if(hi_compass <= turn ||\n        low_compass >= turn){\n        msg.topic = \"stolen\";\n        flow.set(\"status\" , \"stolen\");    \n        }\n        \n}\n\n\n\nreturn msg;",
+        "func": "msg.header = {\"Content-Type\" : \"application/json\"};\n\nvar now = new Date(); \nvar last = flow.get(\"last\"); \nvar storedTurn = flow.get(\"storedTurn\"); \nvar x, y, z, speed;\nvar mopedStats = msg.payload;\nvar turn  = mopedStats.compass;\nif(msg.topic == \"Unlocked\"){\n    msg.topic = \"not stolen\";\n}\n\nelse if(storedTurn === null){\n        flow.set(\"storedTurn\", mopedStats.compass);\n        console.log(\"Stored compass as %i\", mopedStats.compass);\n} \n\nif(flow.get(\"status\") == \"Locked\"){\n    flow.set(\"last\", now.getTime());\n    \n    x = mopedStats.acceleration.x;\n    y = mopedStats.acceleration.y; \n    z = mopedStats.acceleration.z; \n   \n    speed = Math.sqrt(Math.pow(x,2)+Math.pow(y,2)+Math.pow(z,2));\n}else{\n    speed = 0;\n    \n}\n\nif(speed > 1.15){\n    console.log(\"Speed %f\",speed);\n\n     let hi_compass = (storedTurn + 12) % 360;\n     let low_compass = Math.abs((storedTurn -12) % 360);\n        console.log(\"Compass hi: %i low: %i stored: %f, current: %f\",hi_compass, low_compass, storedTurn, turn); \n        if(hi_compass <= turn ||\n        low_compass >= turn){\n        msg.topic = \"stolen\";\n        flow.set(\"status\" , \"stolen\");    \n        }\n        \n}\n\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 592.5715179443359,
-        "y": 103.0000114440918,
+        "x": 597.5715484619141,
+        "y": 103.0000147819519,
         "wires": [
             [
                 "c6b6dcc2.44b84"
@@ -388,5 +388,24 @@
         "x": 595.952392578125,
         "y": 60.95237922668457,
         "wires": []
+    },
+    {
+        "id": "cb8c5535.f083c8",
+        "type": "inject",
+        "z": "e4f445b1.148048",
+        "name": "Clear all",
+        "topic": "Unlocked",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 573.166675567627,
+        "y": 200.8888921737671,
+        "wires": [
+            [
+                "e965b320.b659b"
+            ]
+        ]
     }
 ]
