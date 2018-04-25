@@ -1,5 +1,5 @@
 # Internet of Things Bike Lock
-Team Members: Ross Higa, Nainoa Jorg, Martiza Sagovia, Jianna Orias
+Team Members: Ross Higa, Nainoa Jorg, Jianna Orias
 
 
 An exercise to develop a lock for Internet of Things class at UH Manoa.
