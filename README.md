@@ -28,3 +28,6 @@ finalsourcePi.txt is a JSON flow designed to be deployed on Node-RED for [IBM Bl
 The domain name of the HTTPS site must be set in the Bluemix Flow
 The domain name of the Bluemix Node-RED must be set at the bottom of index.html
 
+## Questions
+
+Please see the enclosed paper and presentations
